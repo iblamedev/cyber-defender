@@ -117,12 +117,6 @@ Contributions are welcome. To propose changes:
 
 ---
 
-## License
-
-This project is released under the MIT License. See `LICENSE` for details.
-
----
-
 ## Acknowledgments
 
 Inspired by classic arcade systems and contemporary cybersecurity concepts, aiming to merge entertainment with thematic relevance.
