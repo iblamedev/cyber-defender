@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; media-src 'self'; connect-src 'self' https://cdnjs.cloudflare.com; img-src 'self' data:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta name="referrer" content="no-referrer">
+  <title>Cipher Requiem - 2D Edition</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Roboto:wght@400;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
+</head>
+
+<body>
+
+  <!-- Startup Intro Overlay -->
+  <div id="startup-intro-overlay" class="hidden">
+    <video id="startup-intro-video" src="/static/IntroAnimation.mp4" preload="auto" playsinline></video>
+    <div id="startup-intro-hint" class="hidden">Click to start</div>
+  </div>
+
+  <!-- Login Screen -->
+  <div id="login-screen">
+    <canvas id="loginCanvas"></canvas>
+    <div id="login-form-container">
+      <h1>CIPHER REQUIEM</h1>
+      <p id="login-msg">Access the mainframe</p>
+      <input type="text" id="username" placeholder="USERNAME (3-8 chars)" maxlength="8">
+      <input type="password" id="password" placeholder="PASSWORD">
+      <div class="login-btns">
+        <button id="btn-guest">PLAY AS GUEST</button>
+        <button id="btn-login">LOGIN</button>
+        <button id="btn-create">CREATE ACCOUNT</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- World Select Screen -->
+  <div id="world-select-screen" class="hidden">
+    <div id="world-select-container">
+      <h1>Select World</h1>
+      <div id="world-list">
+        <!-- Worlds injected here -->
+      </div>
+      <div class="world-btns">
+        <button id="btn-play-world">Play Selected World</button>
+        <button id="btn-delete-world">Delete Selected World</button>
+      </div>
+      <div class="world-btns">
+        <button id="btn-create-world">Create New World</button>
+        <button id="btn-cancel-world">Log Out</button>
+      </div>
+    </div>
+
+    <!-- Custom Create World Modal -->
+    <div id="create-world-modal" class="hidden">
+      <div id="create-world-box">
+        <h2>Create New World</h2>
+        <input type="text" id="new-world-name" placeholder="World Name (Max 15 chars)" maxlength="15">
+        <div class="world-modal-btns">
+          <button id="btn-confirm-create">Create</button>
+          <button id="btn-cancel-create">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Game Canvas -->
+  <canvas id="gameCanvas"></canvas>
+
+  <!-- HUD -->
+  <div id="hud">
+    <!-- Stats hidden as requested -->
+    <button id="dict-btn">CyberPedia</button>
+    <button id="learning-report-btn">Progress</button>
+  </div>
+
+  <!-- Interaction Tooltip -->
+  <div id="interact-tooltip" class="hidden">[E] Interact</div>
+
+  <!-- Cyber Dictionary Modal -->
+  <div id="dict-modal" class="hidden">
+    <div id="enchanting-book">
+      <!-- Left Page: TOC -->
+      <div class="book-page left-page">
+        <h2>Cyberpedia</h2>
+        <ul id="dict-toc">
+          <li data-def-index="0">Phishing</li>
+          <li data-def-index="1">Deepfake</li>
+          <li data-def-index="2">Malware (Virus)</li>
+          <li data-def-index="3">Trojan / Keylogger</li>
+          <li data-def-index="4">Brute Force</li>
+          <li data-def-index="5">Zero-Day Attack</li>
+        </ul>
+      </div>
+
+      <!-- Right Page: Content -->
+      <div class="book-page right-page" id="book-content-page">
+        <div class="page-content">
+          <h3 id="def-title">Select a Threat</h3>
+          <p id="def-text">Click a topic on the left page to decipher its malicious signature.</p>
+        </div>
+      </div>
+    </div>
+    <button id="close-dict-btn">Return to Game</button>
+  </div>
+
+  <!-- Battle UI Overlay -->
+  <div id="battle-scene" class="hidden">
+    <div id="domain-expansion-bg" class="hidden"></div>
+    <div id="battle-flash"></div>
+
+    <!-- Enemy Status (Top Left) -->
+    <div class="status-box enemy-status">
+      <div class="status-header">
+        <span id="enemy-name">ZOMBIE</span>
+        <span class="level">Lv50</span>
+      </div>
+      <div class="hp-bar-container">
+        <span class="hp-label">HP</span>
+        <div class="hp-track">
+          <div id="enemy-hp-fill" class="hp-fill"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Player Status (Bottom Right) -->
+    <div class="status-box player-status">
+      <div class="status-header">
+        <span id="player-name">AGENT</span>
+        <span class="level">Lv99</span>
+      </div>
+      <div class="hp-bar-container">
+        <span class="hp-label">HP</span>
+        <div class="hp-track">
+          <div id="player-hp-fill" class="hp-fill"></div>
+        </div>
+      </div>
+      <div class="hp-text"><span id="player-hp-text">100</span> / 100</div>
+    </div>
+  </div>
+
+  <!-- Dialogue Box Pokemon Style -->
+  <div id="dialog-box" class="hidden">
+    <div id="dialog-speaker">Villager</div>
+    <div id="dialog-text">Hello, traveler!</div>
+    <div id="dialog-hint">Press Spacebar or Enter</div>
+    <div id="dialog-prompt" class="blink">▼</div>
+  </div>
+
+  <!-- Combat / Options Menu -->
+  <div id="combat-menu" class="hidden">
+    <div class="combat-grid" id="combat-options">
+      <!-- Options injected by JS -->
+    </div>
+  </div>
+
+  <!-- Climax Video Overlay -->
+  <div id="video-overlay" class="hidden">
+    <video id="climax-video" src="/static/SpecialCutscene.mp4" preload="none"></video>
+  </div>
+
+  <!-- Instructions Modal -->
+  <div id="instructions-modal">
+    <div class="modal-content">
+      <h2>CIPHER REQUIEM 2D</h2>
+      <p>Welcome, Agent! Your mission is to cleanse the network from malicious threats.</p>
+      <ul>
+        <li><strong>MOVE:</strong> W, A, S, D or Arrow Keys </li>
+        <li><strong>INTERACT:</strong> Press 'E' near NPCs or Portals </li>
+        <li><strong>LEARN:</strong> Use the CyberPedia for threat definitions </li>
+      </ul>
+      <p style="color: #d32f2f; font-size: 12px; margin-top: 15px;">Note: You must cleanse the Phishing (Cyan) and
+        Deepfake (Pink) portals before the others unlock!</p>
+      <button id="start-game-btn">START MISSION</button>
+      <button id="close-instructions-btn" class="hidden">Close</button>
+    </div>
+  </div>
+
+  <!-- Pause Modal -->
+  <div id="pause-modal" class="hidden">
+    <div class="modal-content">
+      <h2>PAUSED</h2>
+      <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 20px;">
+        <button id="btn-resume">Resume Game</button>
+        <button id="btn-pause-instructions">Instructions</button>
+        <button id="btn-pause-report">Progress</button>
+        <button id="btn-exit-world" style="background: #a00;">Exit World</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="learning-report-modal" class="hidden">
+    <div class="modal-content">
+      <h2>Progress Summary</h2>
+      <div id="learning-report-content"></div>
+      <div style="display:flex; gap:10px; margin-top: 16px;">
+        <button id="btn-close-report">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Final Boss Warning -->
+  <div id="final-warning" class="hidden">
+    <h1>DARKNET DEVIL APPROACHES</h1>
+  </div>
+
+  <!-- Ending Credits Screen -->
+  <div id="credits-screen" class="hidden">
+    <canvas id="creditsCanvas"></canvas>
+    <div id="credits-content">
+      <h1 class="credits-main-title">CIPHER REQUIEM</h1>
+      <div id="credits-scroll-container">
+        <!-- Javascript will inject credit boxes here -->
+      </div>
+      <button id="restart-game-btn" class="hidden">▶ Play Again</button>
+    </div>
+  </div>
+
+  <audio id="bgm" src="/static/game-ost.mp3?v=2" loop preload="auto"></audio>
+  <audio id="final-bgm" src="/static/final-ost.mp3?v=2" loop preload="auto"></audio>
+
+  <script src="/static/game.js"></script>
+</body>
+
+</html>
