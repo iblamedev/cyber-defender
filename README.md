@@ -58,7 +58,7 @@ The project follows a simple modular structure to maintain clarity and separatio
 ---
 
 ## Getting Started
-
+**THE STATIC VFX FILES WERE TOO LARGE TO UPLOAD HERE, HENCE NOT UPLOADED HERE.**
 ### Prerequisites
 
 A modern web browser (Chrome, Edge, Firefox recommended)
